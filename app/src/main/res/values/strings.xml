@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SMSer</string>
+    <string name="enter_the_text_to_be_sent">Enter the text to be sent..</string>
+    <string name="smser">SMSer</string>
+    <string name="enter_the_phone_number">Enter the Phone Number</string>
+    <string name="choose_time">Choose Time</string>
+    <string name="send_sms">Save Params</string>
+</resources>
