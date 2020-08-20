@@ -62,14 +62,14 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
         c.set(Calendar.SECOND , 0);
         text = text_msg.getText().toString().trim();
         no = phone_no.getText().toString().trim();
-        if(!text.isEmpty() && ! no.isEmpty()) {
-            sendSMS(c);
+        if(!text.isEmpty() && ! no.isEmpty() && no.length()!=10) {
+            sendSMS(hourOfDay , minute);
             Toast t = Toast.makeText(MainActivity.this , "SMS scheduled at " + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + " Hours..."  , Toast.LENGTH_LONG);
             t.setGravity(Gravity.CENTER | Gravity.BOTTOM , 0 , 0);
             t.show();
         }
         else{
-            Toast t = Toast.makeText(MainActivity.this , "Enter the text and phone number first!!", Toast.LENGTH_LONG);
+            Toast t = Toast.makeText(MainActivity.this , "Enter the text and phone number first!!/nThen pick Delivery Time Again.. " , Toast.LENGTH_LONG);
             t.setGravity(Gravity.CENTER | Gravity.BOTTOM , 0 , 0);
             t.show();
         }
@@ -77,17 +77,13 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
 
 //+ DateFormat.getTimeInstance(DateFormat.SHORT).format(c)
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void sendSMS(Calendar c){
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this , AlertReciever.class);
+    private void sendSMS(int hour , int minute){
+        Intent intent = new Intent(this,myService.class);
         intent.putExtra("text" , text);
         intent.putExtra("no" , no);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext() , 1 , intent , PendingIntent.FLAG_UPDATE_CURRENT);
-
-        if(c.before(Calendar.getInstance())){
-            c.add(Calendar.DATE , 1);
-        }
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP , c.getTimeInMillis() , pendingIntent);
+        intent.putExtra("hour" , hour);
+        intent.putExtra("minute" , minute);
+        startService(intent);
     }
     public Boolean checkPermission(String perm)
     {
