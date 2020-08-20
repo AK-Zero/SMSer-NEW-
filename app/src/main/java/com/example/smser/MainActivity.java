@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.telephony.SmsManager;
 import android.view.Gravity;
@@ -62,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
         c.set(Calendar.SECOND , 0);
         text = text_msg.getText().toString().trim();
         no = phone_no.getText().toString().trim();
-        if(!text.isEmpty() && ! no.isEmpty() && no.length()!=10) {
-            sendSMS(hourOfDay , minute);
+        if(!text.isEmpty() && no.length()==10) {
+            sendSMS(hourOfDay , minute , c);
             Toast t = Toast.makeText(MainActivity.this , "SMS scheduled at " + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + " Hours..."  , Toast.LENGTH_LONG);
             t.setGravity(Gravity.CENTER | Gravity.BOTTOM , 0 , 0);
             t.show();
@@ -77,13 +78,20 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
 
 //+ DateFormat.getTimeInstance(DateFormat.SHORT).format(c)
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void sendSMS(int hour , int minute){
+    private void sendSMS(int hour , int minute , Calendar c){
         Intent intent = new Intent(this,myService.class);
         intent.putExtra("text" , text);
         intent.putExtra("no" , no);
         intent.putExtra("hour" , hour);
         intent.putExtra("minute" , minute);
-        startService(intent);
+        ContextCompat.startForegroundService(this, intent);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stopService(new Intent(MainActivity.this, myService.class));
+            }
+        },c.getTimeInMillis()-Calendar.getInstance().getTimeInMillis()+5000);
     }
     public Boolean checkPermission(String perm)
     {
